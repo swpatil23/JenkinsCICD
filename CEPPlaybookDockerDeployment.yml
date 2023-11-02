@@ -1,0 +1,11 @@
+- hosts: webserver
+  become: true
+  tasks:
+    - name: Start docker service
+      service: name=docker state=started
+    - name: copy the war file in same directory as that of dockerfile
+      copy: src=/tmp/mycode/target/addressbook.war dest=/tmp/mycode remote_src=yes
+    - name: Build the dockerfile on workernode to generate java tomcat image
+      command: chdir=/tmp/mycode docker build -t cep_image .
+    - name: Run image to create Tomcat containers
+      command: docker run -d -P cep_image
